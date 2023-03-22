@@ -1,21 +1,20 @@
 ## 🦙🌲🤏 Alpaca-LoRA: Low-Rank LLaMA Instruct-Tuning
 
-- Try the pretrained model out on Colab [here](https://colab.research.google.com/drive/1eWAmesrW99p7e1nah5bipn0zikMb8XYC)
-- Share custom LoRA adapters, including adapters for the larger models, [here](https://github.com/tloen/alpaca-lora/issues/52)
+- 在Colab上尝试预训练的模型 [here](https://colab.research.google.com/drive/1eWAmesrW99p7e1nah5bipn0zikMb8XYC)
+- 分享定制的LoRA适配器，包括用于较大的适配器。 [here](https://github.com/tloen/alpaca-lora/issues/52)
 - Users have created a Discord server for discussion and support [here](https://discord.gg/prbq284xX5)
 - `alpaca-lora-30b` can be used like ChatGPT; see [here](https://twitter.com/algo_diver/status/1637851640027041798)
 
 This repository contains code for reproducing the [Stanford Alpaca](https://github.com/tatsu-lab/stanford_alpaca) results using [low-rank adaptation (LoRA)](https://arxiv.org/pdf/2106.09685.pdf).
-We provide an Instruct model of similar quality to `text-davinci-003` that can run [on a Raspberry Pi](https://twitter.com/miolini/status/1634982361757790209) (for research),
+我们提供的Instruct模型的质量类似于 `text-davinci-003` that can run [on a Raspberry Pi](https://twitter.com/miolini/status/1634982361757790209) (for research),
 and the code is easily extended to the `13b`, `30b`, and `65b` models.
 
-In addition to the training code, which runs within five hours on a single RTX 4090,
-we publish a script for downloading and inference on the foundation model and LoRA,
-as well as the resulting [LoRA weights themselves](https://huggingface.co/tloen/alpaca-lora-7b/tree/main).
-To fine-tune cheaply and efficiently, we use Hugging Face's [PEFT](https://github.com/huggingface/peft)
+除了在单个RTX 4090上运行5个小时的训练代码外，我们还发布了一个用于下载和推理基础模型和LoRA的脚本。
+以及[LoRA权重本身](https://huggingface.co/tloen/alpaca-lora-7b/tree/main)。
+为了廉价而有效地进行微调，我们使用了Hugging Face的 [PEFT](https://github.com/huggingface/peft)
 as well as Tim Dettmers' [bitsandbytes](https://github.com/TimDettmers/bitsandbytes).
 
-Without hyperparameter tuning, the LoRA model produces outputs comparable to the Stanford Alpaca model. (Please see the outputs included below.) Further tuning might be able to achieve better performance; I invite interested users to give it a try and report their results.
+在没有超参数调整的情况下，LoRA模型产生的输出与斯坦福大学的Alpaca模型相当。(请看下面包括的输出结果。)进一步的调整可能能够实现更好的性能；我邀请感兴趣的用户进行尝试并报告他们的结果。
 
 ### Setup
 
@@ -29,29 +28,23 @@ pip install -r requirements.txt
 
 ### Inference (`generate.py`)
 
-This file reads the foundation model from the Hugging Face model hub and the LoRA weights from `tloen/alpaca-lora-7b`, and runs a Gradio interface for inference on a specified input. Users should treat this as example code for the use of the model, and modify it as needed.
+该文件从Hugging Face模型中心读取基础模型，从`tloen/alpaca-lora-7b`读取LoRA权重，并在指定的输入上运行Gradio接口进行推理。用户应将其视为模型使用的样本代码，并根据需要进行修改。
 
 ### Training (`finetune.py`)
 
-This file contains a straightforward application of PEFT to the LLaMA model,
-as well as some code related to prompt construction and tokenization.
-Near the top of this file is a set of hardcoded hyperparameters that you should feel free to modify.
-PRs adapting this code to support larger models are always welcome.
+这个文件包含了PEFT对LLaMA模型的直接应用，以及一些与提示构建和tokenization有关的代码。
+在这个文件的顶部有一组硬编码的超参数，你可以随意修改。我们随时欢迎对该代码进行调整以支持更大的模型的PR。
 
 ### Checkpoint export (`export_*_checkpoint.py`)
-
-These files contain scripts that merge the LoRA weights back into the base model
-for export to Hugging Face format and to PyTorch `state_dicts`.
-They should help users
+这些文件包含将LoRA权重合并到基础模型中的脚本，以便导出为Hugging Face格式和PyTorch `state_dicts`。它们应该帮助用户
 who want to run inference in projects like [llama.cpp](https://github.com/ggerganov/llama.cpp)
 or [alpaca.cpp](https://github.com/antimatter15/alpaca.cpp).
 
 ### Dataset
-
-In addition to `alpaca_data.json`, which contains the original Stanford Alpaca dataset,
+除了`alpaca_data.json`，它包含了原始的斯坦福羊驼数据集。
 we also include `alpaca_data_cleaned.json`, which has been [stripped of various tokenization artifacts](https://github.com/tloen/alpaca-lora/pull/32)
 with the help of @gururise.
-This file is now used by default in the training script.
+现在训练脚本中默认使用这个文件。
 
 @AndriyMulyar has also provided interactive, embedding-based visualizations of the original dataset's [instructions](https://atlas.nomic.ai/map/alpaca_instructions)
 and [outputs](https://atlas.nomic.ai/map/alpaca_outputs),
@@ -59,8 +52,8 @@ as well as [clusters of bad examples](https://atlas.nomic.ai/map/d2139cc3-bc1c-4
 
 ### Notes
 
-- We can likely improve our model performance significantly if we had a better dataset. Consider supporting the [LAION Open Assistant](https://open-assistant.io/) effort to produce a high-quality dataset for supervised fine-tuning (or bugging them to release their data).
-- We're continually fixing bugs and conducting training runs, and the weights on the Hugging Face Hub are being updated accordingly. In particular, those facing issues with response lengths should make sure that they have the latest version of the weights and code.
+- 如果我们有一个更好的数据集，我们可能会大大改善我们的模型性能。考虑支持[LAION Open Assistant](https://open-assistant.io/)的努力，为监督下的微调制作一个高质量的数据集（或窃听他们发布他们的数据）。
+- 我们正在不断地修复错误并进行训练，而Hugging Face Hub上的权重也在相应地更新。特别是，那些面临响应长度问题的人应该确保他们有最新版本的权重和代码。
 
 ### Example outputs
 
